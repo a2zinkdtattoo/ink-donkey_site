@@ -3,7 +3,7 @@
    WhatsApp / phone / Waze / Instagram clicks, flash "claim" clicks, language switch.
    No names or contact details are collected. */
 (function () {
-  var GA_ID = "G-XXXXXXXXXX"; // Google Analytics measurement ID
+  var GA_ID = "G-TN1R32T3L5"; // Google Analytics measurement ID
   var KEY = "id-consent";      // "yes" | "no", remembered per browser
 
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
