@@ -362,8 +362,6 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
   .hero .ctas { width: 100%; }
   .hero .ctas .btn { flex: 1 1 100%; justify-content: center; }
   .hero-photo { justify-self: stretch; width: 100%; }
-  .hero-facts { display: grid; gap: 4px; }
-  .hero-facts li + li::before { display: none; }
   .hero-photo img { aspect-ratio: 4 / 3; object-position: 50% 40%; }
 }
 
@@ -400,6 +398,11 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
 }
 
 .bar-label { display: none; }
+
+/* comfortable tap targets */
+.filters button { min-height: 40px; }
+.lang button { min-height: 34px; min-width: 40px; }
+@media (max-width: 1100px) { .hero-facts { display: grid; gap: 4px; } .hero-facts li + li::before { display: none; } }
 </style>
 </head>
 <body>
