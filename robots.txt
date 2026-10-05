@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://inkdonkey.com/sitemap.xml
