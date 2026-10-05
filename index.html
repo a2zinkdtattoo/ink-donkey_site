@@ -4,16 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="google-site-verification" content="gYtilhin2MMZuocPP3wU8hdLREtMRiE_08mHiZBxCrk">
-<meta name="description" content="Ink Donkey – traditional tattoo shop in Even Yehuda, Israel. About 25 years of experience: Traditional, Japanese, custom tattoos and cover-ups. Book on WhatsApp or call 050-686-5954.">
+<meta name="description" content="Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp.">
 <link rel="canonical" href="https://inkdonkey.com/">
 <link rel="icon" href="/img/logo-mark.jpg">
+<link rel="preload" as="image" href="img/hero-bulldog-640.webp" imagesrcset="img/hero-bulldog-640.webp 640w, img/hero-bulldog-800.webp 800w, img/hero-bulldog-1000.webp 1000w" imagesizes="(max-width: 760px) 92vw, 400px" fetchpriority="high">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://inkdonkey.com/">
-<meta property="og:title" content="Ink Donkey Tattoo Shop · Even Yehuda">
-<meta property="og:description" content="Ink Donkey – traditional tattoo shop in Even Yehuda, Israel. About 25 years of experience: Traditional, Japanese, custom tattoos and cover-ups. Book on WhatsApp or call 050-686-5954.">
+<meta property="og:title" content="Ink Donkey · Traditional Tattoo Studio in Even Yehuda">
+<meta property="og:description" content="Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp.">
 <meta property="og:image" content="https://inkdonkey.com/img/large/studio-room.jpg">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TattooParlor", "name": "Ink Donkey Tattoo", "url": "https://inkdonkey.com/", "telephone": "+972-50-686-5954", "image": "https://inkdonkey.com/img/large/studio-room.jpg", "logo": "https://inkdonkey.com/img/logo-mark.jpg", "address": {"@type": "PostalAddress", "streetAddress": "70 HaMeyasdim St", "addressLocality": "Even Yehuda", "addressCountry": "IL"}, "areaServed": ["Even Yehuda", "Netanya", "Kadima-Tzoran", "Tel Mond", "Kfar Yona", "Sharon"], "sameAs": ["https://www.instagram.com/inkdonkey/", "https://www.instagram.com/alexey_inkdonkey/"]}</script>
-<title>Ink Donkey Tattoo Shop</title>
+<title>Ink Donkey · Traditional Tattoo Studio in Even Yehuda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Karantina:wght@400&family=Rubik:wght@400;500;700&display=swap">
@@ -441,7 +442,7 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
       </ul>
     </div>
     <figure class="hero-photo">
-      <img src="img/bulldog.jpg" srcset="img/bulldog.jpg 720w, img/large/bulldog.jpg 1200w" sizes="(max-width: 760px) 92vw, 400px" width="720" height="900" fetchpriority="high" alt="Traditional bulldog tattoo in bold color by Ink Donkey" data-i18n-alt="heroAlt">
+      <img src="img/bulldog.jpg" srcset="img/hero-bulldog-640.webp 640w, img/hero-bulldog-800.webp 800w, img/hero-bulldog-1000.webp 1000w" sizes="(max-width: 760px) 92vw, 400px" width="720" height="900" fetchpriority="high" alt="Traditional bulldog tattoo in bold color by Ink Donkey" data-i18n-alt="heroAlt">
       <figcaption data-i18n="heroCap">Bulldog · traditional</figcaption>
     </figure>
   </div>
@@ -476,7 +477,7 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
 
   <section id="artist">
     <div class="wrap artist">
-      <figure class="portrait has-img"><img id="portrait-img" src="img/portrait.jpg" width="880" height="1100" alt="Alexey Zamotevsky tattooing at Ink Donkey tattoo studio, Even Yehuda" loading="lazy"></figure>
+      <figure class="portrait has-img"><img id="portrait-img" src="img/portrait.jpg" srcset="img/thumb/portrait.webp 480w, img/portrait.jpg 880w" sizes="(max-width: 760px) 92vw, 340px" width="880" height="1100" decoding="async" alt="Alexey Zamotevsky tattooing at Ink Donkey tattoo studio, Even Yehuda" loading="lazy"></figure>
       <div>
         <div class="eyebrow" data-i18n="artistEyebrow">Tattoo artist</div>
         <h2 class="sign" data-i18n="artistName">Alexey Zamotevsky</h2>
@@ -653,7 +654,7 @@ const T = {
     stCov: "Cover-up",
     stHea: "Healed work",
     title: "Ink Donkey · Traditional Tattoo Studio in Even Yehuda",
-    desc: "Ink Donkey – traditional tattoo shop in Even Yehuda, Israel. About 25 years of experience: Traditional, Japanese, custom tattoos and cover-ups. Book on WhatsApp or call 050-686-5954."
+    desc: "Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp."
   },
   he: {
     draft: "טיוטת קונספט · התמונות זמניות",
@@ -800,12 +801,14 @@ const SHOP = [
 
 const LIMIT = 8;
 let expanded = false;
+const thumb = src => src.replace("img/", "img/thumb/").replace(/\.jpg$/, ".webp");
+
 function tile(w, i) {
   const t = T[lang];
   const story = w.story ? `<small>${w.story[lang]}</small>` : "";
   const ba = w.pair && w.pair.length ? `<span class="ba ba-before">${t[w.pair[0]]}</span><span class="ba ba-after">${t[w.pair[1]]}</span>` : "";
   return w.img
-    ? `<figure class="tile photo${w.pair ? " wide" : ""}" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" alt="${w.alt[lang] + SEO[lang]}" loading="lazy">${ba}<figcaption><b>${w[lang]}</b>${story}</figcaption></figure>`
+    ? `<figure class="tile photo${w.pair ? " wide" : ""}" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" srcset="${thumb(w.img)} ${w.pair ? 800 : 480}w, ${w.img} ${w.pair ? 1300 : 720}w" sizes="${w.pair ? "(max-width: 760px) 92vw, 560px" : "(max-width: 760px) 46vw, 270px"}" alt="${w.alt[lang] + SEO[lang]}" loading="lazy" decoding="async" fetchpriority="low">${ba}<figcaption><b>${w[lang]}</b>${story}</figcaption></figure>`
     : `<div class="tile" data-glyph="${w.g}"><b>${w[lang]}</b>${story}</div>`;
 }
 
@@ -838,7 +841,7 @@ function render() {
   const limit = expanded ? shown.length : LIMIT;
   document.getElementById("grid").innerHTML = shown.slice(0, limit).map(tile).join("");
   document.getElementById("shop-grid").innerHTML = SHOP.map((w, i) =>
-    `<figure class="shop-${i} tile photo" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" alt="${w.alt[lang] + SEO[lang]}" loading="lazy"><figcaption><b>${w[lang]}</b></figcaption></figure>`).join("");
+    `<figure class="shop-${i} tile photo" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" srcset="${thumb(w.img)} 480w, ${w.img} 720w" sizes="(max-width: 760px) 46vw, 270px" alt="${w.alt[lang] + SEO[lang]}" loading="lazy" decoding="async" fetchpriority="low"><figcaption><b>${w[lang]}</b></figcaption></figure>`).join("");
   const more = document.getElementById("more");
   more.hidden = expanded || shown.length <= LIMIT;
   more.textContent = t.showAll.replace("{n}", shown.length);
