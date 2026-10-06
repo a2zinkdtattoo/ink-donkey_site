@@ -7,7 +7,40 @@
 <meta name="description" content="Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp.">
 <link rel="canonical" href="https://inkdonkey.com/">
 <link rel="icon" href="/img/logo-mark.jpg">
-<link rel="preload" as="image" href="img/hero-bulldog-640.webp" imagesrcset="img/hero-bulldog-640.webp 640w, img/hero-bulldog-800.webp 800w, img/hero-bulldog-1000.webp 1000w" imagesizes="(max-width: 760px) 92vw, 400px" fetchpriority="high">
+<script>
+/* Hero carousel: pick 5 works once per browser session (first one from the top three), and preload the first photo. */
+document.documentElement.classList.add("js");
+window.HERO_POOL = [
+  { id: "bulldog", top: 1, cat: "color" }, { id: "bat", top: 1, cat: "color" }, { id: "knight", top: 1, cat: "cover" },
+  { id: "swallow", cat: "color" }, { id: "sacred-heart", cat: "color" }, { id: "crown-skull", cat: "color" },
+  { id: "dagger", cat: "color" }, { id: "sunflower", cat: "color" },
+  { id: "samurai-toad", cat: "jap" }, { id: "kokeshi-doch", cat: "jap" },
+  { id: "eye-horseshoe", cat: "bw" }, { id: "bird-flowers", cat: "bw" }, { id: "winged-wheel", cat: "bw" }, { id: "skull-cacti", cat: "bw" }
+];
+(function () {
+  var pool = window.HERO_POOL, ids = pool.map(function (p) { return p.id; }), set = null;
+  try { set = JSON.parse(sessionStorage.getItem("id-hero")); } catch (e) {}
+  var ok = Array.isArray(set) && set.length === 5 && set.every(function (x, i) { return ids.indexOf(x) > -1 && set.indexOf(x) === i; });
+  if (!ok) {
+    var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+    var first = shuffle(pool.filter(function (p) { return p.top; }))[0];
+    var rest = shuffle(pool.filter(function (p) { return p !== first; })), picked = [first], cats = {};
+    cats[first.cat] = 1;
+    rest.forEach(function (p) { if (picked.length < 5 && p.cat !== "cover" && !cats[p.cat]) { picked.push(p); cats[p.cat] = 1; } }); // mix colour, black & grey and Japanese when possible
+    rest.forEach(function (p) { if (picked.length < 5 && picked.indexOf(p) < 0) picked.push(p); });
+    set = [first.id].concat(shuffle(picked.slice(1)).map(function (p) { return p.id; }));
+    try { sessionStorage.setItem("id-hero", JSON.stringify(set)); } catch (e) {}
+  }
+  window.HERO_SET = set;
+  var at = 0; try { at = +sessionStorage.getItem("id-hero-at") || 0; } catch (e) {}
+  var shown = set[at > 0 && at < 5 ? at : 0];
+  var l = document.createElement("link");
+  l.rel = "preload"; l.as = "image"; l.setAttribute("fetchpriority", "high");
+  l.setAttribute("imagesrcset", ["480", "640", "800"].map(function (w) { return "img/hero/" + shown + "-" + w + ".webp " + w + "w"; }).join(", "));
+  l.setAttribute("imagesizes", "(max-width: 760px) 78vw, 400px");
+  document.head.appendChild(l);
+})();
+</script>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://inkdonkey.com/">
 <meta property="og:title" content="Ink Donkey · Traditional Tattoo Studio in Even Yehuda">
@@ -348,9 +381,35 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
 .hero-facts li + li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--teal-hi); align-self: center; margin-inline-end: 14px; }
 .hero-facts b { font-family: var(--display); font-weight: 400; color: var(--bone); font-size: 18px; }
 .hero-facts a { color: var(--bone); text-decoration: none; border-bottom: 1px solid var(--line); }
-.hero-photo { margin: 0; position: relative; justify-self: end; width: min(400px, 100%); }
-.hero-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border: 1px solid var(--line); }
-.hero-photo figcaption { position: absolute; inset-inline-start: 12px; bottom: 12px; background: rgba(9, 12, 13, .78); color: var(--bone); font-size: 13px; padding: 4px 10px; border-radius: 3px; }
+.hero-photo { margin: 0; position: relative; justify-self: end; width: min(400px, 100%); padding: 0; border: 0; }
+/* ---------- Hero carousel: fixed 4:5 frame, so nothing around it ever moves ---------- */
+.cr-frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--ink-2); border: 1px solid var(--line); touch-action: pan-y; }
+.cr-static { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cr-frame.is-built .cr-static { display: none; }
+.cr-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .5s ease, visibility 0s linear .5s; }
+.cr-slide.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
+.cr-slide img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
+.cr-cap { position: absolute; inset-inline-start: 12px; bottom: 12px; max-width: calc(100% - 24px); background: rgba(9, 12, 13, .8); color: var(--bone); font-size: 13px; line-height: 1.4; padding: 4px 10px; border-radius: 3px; }
+.cr-cap:empty { display: none; }
+.cr-open { position: absolute; inset: 0; z-index: 2; background: transparent; border: 0; padding: 0; cursor: zoom-in; }
+.cr-open:focus-visible { outline: 3px solid var(--teal-hi); outline-offset: -3px; }
+.cr-controls { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.cr-controls[hidden] { display: none; }
+.cr-dots { flex: 1; display: flex; justify-content: center; gap: 2px; }
+.cr-dot { width: 32px; height: 40px; display: grid; place-items: center; background: none; border: 0; padding: 0; cursor: pointer; }
+.cr-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); box-shadow: 0 0 0 1px #3a4a47; transition: background-color .3s ease, transform .3s ease; }
+.cr-dot[aria-current="true"]::before { background: var(--teal-hi); box-shadow: none; transform: scale(1.25); }
+.cr-dot:hover::before { background: var(--muted); }
+.cr-dot[aria-current="true"]:hover::before { background: var(--teal-hi); }
+.cr-btn { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: transparent; color: var(--bone); border: 1px solid var(--line); cursor: pointer; transition: border-color .3s ease, background-color .3s ease; }
+.cr-btn:hover { border-color: var(--muted); background: rgba(238, 243, 242, .04); }
+.cr-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cr-pause .i-play { display: none; fill: currentColor; stroke: none; }
+.cr-pause.is-paused .i-pause { display: none; }
+.cr-pause.is-paused .i-play { display: inline; }
+.cr-pause { width: 36px; height: 36px; }
+html[dir="rtl"] .cr-prev svg, html[dir="rtl"] .cr-next svg { transform: scaleX(-1); }
+@media (prefers-reduced-motion: reduce) { .cr-slide, .cr-slide.is-active { transition: none; } }
 .hero-text > * { animation: rise .9s var(--ease) both; }
 .hero-text > :nth-child(2) { animation-delay: .1s; } .hero-text > :nth-child(3) { animation-delay: .18s; }
 .hero-text > :nth-child(4) { animation-delay: .26s; } .hero-text > :nth-child(5) { animation-delay: .34s; } .hero-text > :nth-child(6) { animation-delay: .42s; }
@@ -361,8 +420,13 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
   .hero .lockup { display: none; }
   .hero .ctas { width: 100%; }
   .hero .ctas .btn { flex: 1 1 100%; justify-content: center; }
-  .hero-photo { justify-self: stretch; width: 100%; }
-  .hero-photo img { aspect-ratio: 4 / 3; object-position: 50% 40%; }
+  /* phone: offer, then the consultation button, then the photo frame (not the whole screen), then the rest */
+  .hero { gap: 14px; }
+  .hero-text, .hero .ctas { display: contents; }
+  .hero .eyebrow { order: 1; } .hero h1 { order: 2; } .hero .lead { order: 3; } .hero .btn.wa { order: 4; margin-top: 4px; }
+  .hero-photo { order: 5; justify-self: center; width: min(300px, 78vw); margin-top: 10px; }
+  .hero .btn.ghost { order: 6; } .hero-facts { order: 7; }
+  .hero .ctas .btn { flex: none; width: 100%; }
 }
 
 /* ---------- FAQ, artist text, booking hint ---------- */
@@ -444,10 +508,47 @@ html[lang="he"] .hero h1 { font-family: var(--display-he); text-transform: none;
         <li><a href="tel:+972506865954" dir="ltr">050-686-5954</a></li>
       </ul>
     </div>
-    <figure class="hero-photo">
-      <img src="img/bulldog.jpg" srcset="img/hero-bulldog-640.webp 640w, img/hero-bulldog-800.webp 800w, img/hero-bulldog-1000.webp 1000w" sizes="(max-width: 760px) 92vw, 400px" width="720" height="900" fetchpriority="high" alt="Traditional bulldog tattoo in bold color by Ink Donkey" data-i18n-alt="heroAlt">
-      <figcaption data-i18n="heroCap">Bulldog · traditional</figcaption>
-    </figure>
+    <section class="hero-photo carousel" id="hero-carousel" aria-roledescription="carousel" aria-label="Selected work" data-i18n-label="crLabel">
+      <div class="cr-frame" id="cr-frame">
+        <img class="cr-static" src="img/bulldog.jpg" width="720" height="900" alt="Traditional bulldog tattoo in bold color by Ink Donkey" data-i18n-alt="heroAlt">
+      </div>
+      <div class="cr-controls" id="cr-controls" hidden>
+        <button class="cr-btn cr-pause" id="cr-pause" type="button" aria-label="Pause slideshow"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" d="M8 5v14M16 5v14"/><path class="i-play" d="M7 5l12 7-12 7z"/></svg></button>
+        <div class="cr-dots" id="cr-dots"></div>
+        <button class="cr-btn cr-prev" id="cr-prev" type="button" aria-label="Previous work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button class="cr-btn cr-next" id="cr-next" type="button" aria-label="Next work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <p class="sr-only" id="cr-status" aria-live="off"></p>
+    </section>
+    <script>
+    /* build the five slides right here, before the browser paints the hero, so no photo flashes and gets replaced */
+    (function () {
+      var frame = document.getElementById("cr-frame"), set = window.HERO_SET, start = 0;
+      if (!set) return;
+      try { start = +sessionStorage.getItem("id-hero-at") || 0; } catch (e) {}
+      if (!(start > 0 && start < set.length)) start = 0;
+      set.forEach(function (id, i) {
+        var s = document.createElement("div");
+        s.className = "cr-slide" + (i === start ? " is-active" : "");
+        s.setAttribute("role", "group"); s.setAttribute("aria-roledescription", "slide");
+        if (i !== start) s.setAttribute("aria-hidden", "true");
+        var img = document.createElement("img");
+        img.width = 800; img.height = 1000; img.alt = ""; img.decoding = "async";
+        var srcset = ["480", "640", "800"].map(function (w) { return "img/hero/" + id + "-" + w + ".webp " + w + "w"; }).join(", ");
+        img.sizes = "(max-width: 760px) 78vw, 400px";
+        if (i === start) { img.setAttribute("fetchpriority", "high"); img.srcset = srcset; img.src = "img/hero/" + id + "-640.webp"; }
+        else { img.dataset.srcset = srcset; img.dataset.src = "img/hero/" + id + "-640.webp"; }
+        img.onerror = function () { if (!img.dataset.fb) { img.dataset.fb = 1; img.removeAttribute("srcset"); img.src = "img/" + id + ".jpg"; } };
+        var cap = document.createElement("span"); cap.className = "cr-cap";
+        s.appendChild(img); s.appendChild(cap); frame.appendChild(s);
+      });
+      var open = document.createElement("button");
+      open.type = "button"; open.className = "cr-open"; open.id = "cr-open";
+      frame.appendChild(open);
+      frame.classList.add("is-built");
+      document.getElementById("cr-controls").hidden = false;
+    })();
+    </script>
   </div>
 
   <section id="work">
@@ -657,7 +758,16 @@ const T = {
     stCov: "Cover-up",
     stHea: "Healed work",
     title: "Ink Donkey · Traditional Tattoo Studio in Even Yehuda",
-    desc: "Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp."
+    desc: "Ink Donkey – traditional tattoo studio in Even Yehuda with about 25 years of experience. Custom designs, Japanese work and cover-ups. Consultation on WhatsApp.",
+    crLabel: "Selected work",
+    crPause: "Pause slideshow",
+    crPlay: "Play slideshow",
+    crPrev: "Previous work",
+    crNext: "Next work",
+    crGo: "Show work {n}: {name}",
+    crSlide: "{n} of {total}",
+    crOpen: "Open photo: {name}",
+    stBw: "Black & grey"
   },
   he: {
     draft: "טיוטת קונספט · התמונות זמניות",
@@ -712,7 +822,16 @@ const T = {
     stCov: "כיסוי",
     stHea: "אחרי החלמה",
     title: "Ink Donkey · סטודיו לקעקועי טרדישנל באבן יהודה",
-    desc: "Ink Donkey – סטודיו לקעקועי טרדישנל באבן יהודה עם כ־25 שנות ניסיון: טרדישנל, יפני, עיצובים אישיים וכיסויים. לתיאום בוואטסאפ או בטלפון 050-686-5954."
+    desc: "Ink Donkey – סטודיו לקעקועי טרדישנל באבן יהודה עם כ־25 שנות ניסיון: טרדישנל, יפני, עיצובים אישיים וכיסויים. לתיאום בוואטסאפ או בטלפון 050-686-5954.",
+    crLabel: "עבודות נבחרות",
+    crPause: "עצירת המצגת",
+    crPlay: "הפעלת המצגת",
+    crPrev: "העבודה הקודמת",
+    crNext: "העבודה הבאה",
+    crGo: "הצגת עבודה {n}: {name}",
+    crSlide: "{n} מתוך {total}",
+    crOpen: "פתיחת התמונה: {name}",
+    stBw: "שחור-אפור"
   }
 };
 
@@ -826,6 +945,8 @@ function render() {
   document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach(el => { const v = t[el.dataset.i18n]; if (v) el.textContent = v; });
   document.querySelectorAll("[data-i18n-alt]").forEach(el => { const v = t[el.dataset.i18nAlt]; if (v) el.alt = v; });
+  document.querySelectorAll("[data-i18n-label]").forEach(el => { const v = t[el.dataset.i18nLabel]; if (v) el.setAttribute("aria-label", v); });
+  window.heroLang && window.heroLang();
   document.title = t.title;
   const md = document.querySelector('meta[name="description"]'); if (md) md.content = t.desc;
   document.getElementById("wa-float").setAttribute("aria-label", t.ctaBook);
@@ -946,6 +1067,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     ask.href = waHref((lang === "he" ? "שלום! ראיתי באתר את העבודה “" : "Hi! I saw “") + w[lang] + (lang === "he" ? "” ואשמח לקעקוע דומה." : "” on your site and I'd like something similar."));
     count.textContent = (at + 1) + " / " + list.length;
   }
+  window.openLightbox = (w, list) => open(w, list);
   function open(w, list) {
     current = list.filter(x => x.img);
     lastFocus = document.activeElement;
@@ -958,6 +1080,7 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     lb.classList.remove("open"); document.body.classList.remove("lb-locked");
     setTimeout(() => { lb.hidden = true; img.removeAttribute("src"); }, reduceMotion ? 0 : 350);
     lastFocus && lastFocus.focus();
+    window.onLightboxClose && window.onLightboxClose();
   }
   grid.addEventListener("click", e => { const t = e.target.closest(".tile.photo"); if (t) open(shown[+t.dataset.i], shown); });
   grid.addEventListener("keydown", e => {
@@ -995,6 +1118,122 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
     const rtl = document.documentElement.dir === "rtl";
     show(at + ((dx < 0) !== rtl ? 1 : -1));
   });
+})();
+
+// ---------- hero carousel: 5 works per visit, calm cross-fade, full manual control ----------
+(function () {
+  const root = document.getElementById("hero-carousel"), frame = document.getElementById("cr-frame");
+  if (!root || !frame.classList.contains("is-built")) return;
+  const slides = [...frame.querySelectorAll(".cr-slide")], ids = window.HERO_SET;
+  const items = ids.map(id => WORK.find(w => w.img === "img/" + id + ".jpg"));
+  const pool = Object.fromEntries(window.HERO_POOL.map(p => [p.id, p]));
+  const dotsBox = document.getElementById("cr-dots"), pauseBtn = document.getElementById("cr-pause");
+  const openBtn = document.getElementById("cr-open"), status = document.getElementById("cr-status");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const DELAY = 5000;
+  let at = 0, timer = null;
+  let stopped = reduce.matches;            // stopped by the visitor (or by reduced motion) until they press play
+  const holds = new Set();                 // temporary pauses: hover, focus, offscreen, hidden tab, viewer open
+
+  let stored = 0; try { stored = +sessionStorage.getItem("id-hero-at") || 0; } catch (e) {}
+  if (stored > 0 && stored < slides.length) at = stored;
+
+  const dots = slides.map((_, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "cr-dot";
+    b.addEventListener("click", () => { manual(); go(i); });
+    dotsBox.appendChild(b); return b;
+  });
+  const styleOf = id => { const t = T[lang]; return { color: t.stTrad, bw: t.stBw, jap: t.stJap, cover: t.stCov }[pool[id].cat]; };
+  function load(i) {
+    const img = slides[i] && slides[i].querySelector("img");
+    if (img && img.dataset.src) { img.srcset = img.dataset.srcset; img.src = img.dataset.src; delete img.dataset.src; delete img.dataset.srcset; }
+  }
+  function label() {
+    const t = T[lang], n = slides.length;
+    slides.forEach((s, i) => {
+      s.setAttribute("aria-label", t.crSlide.replace("{n}", i + 1).replace("{total}", n));
+      const w = items[i]; if (!w) return;
+      s.querySelector("img").alt = w.alt[lang];
+      s.querySelector(".cr-cap").textContent = w[lang] + " · " + styleOf(ids[i]);
+      dots[i].setAttribute("aria-label", t.crGo.replace("{n}", i + 1).replace("{name}", w[lang]));
+    });
+    openBtn.setAttribute("aria-label", t.crOpen.replace("{name}", items[at] ? items[at][lang] : ""));
+    document.getElementById("cr-prev").setAttribute("aria-label", t.crPrev);
+    document.getElementById("cr-next").setAttribute("aria-label", t.crNext);
+    pauseBtn.setAttribute("aria-label", stopped ? t.crPlay : t.crPause);
+    pauseBtn.classList.toggle("is-paused", stopped);
+  }
+  function go(i) {
+    const n = slides.length; at = (i + n) % n;
+    load(at); load((at + 1) % n);
+    slides.forEach((s, k) => {
+      const on = k === at;
+      s.classList.toggle("is-active", on);
+      on ? s.removeAttribute("aria-hidden") : s.setAttribute("aria-hidden", "true");
+      dots[k].setAttribute("aria-current", on ? "true" : "false");
+    });
+    try { sessionStorage.setItem("id-hero-at", at); } catch (e) {}
+    label();
+    status.textContent = items[at] ? items[at][lang] : "";
+    schedule();
+  }
+  function running() { return !stopped && holds.size === 0; }
+  function schedule() {
+    clearTimeout(timer);
+    status.setAttribute("aria-live", running() ? "off" : "polite");
+    if (running()) timer = setTimeout(() => go(at + 1), DELAY);
+  }
+  function hold(why, on) { on ? holds.add(why) : holds.delete(why); schedule(); }
+  function manual() { stopped = true; label(); }   // any manual step stops autoplay until "play"
+
+  document.getElementById("cr-prev").addEventListener("click", () => { manual(); go(at - 1); });
+  document.getElementById("cr-next").addEventListener("click", () => { manual(); go(at + 1); });
+  pauseBtn.addEventListener("click", () => { stopped = !stopped; label(); if (!stopped) go(at + 1); else schedule(); });
+
+  // keyboard: arrows move when focus is inside the carousel (direction follows the language)
+  root.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const rtl = document.documentElement.dir === "rtl", fwd = (e.key === "ArrowRight") !== rtl;
+    e.preventDefault(); manual(); go(at + (fwd ? 1 : -1));
+  });
+  // temporary pauses
+  root.addEventListener("mouseenter", () => hold("hover", true));
+  root.addEventListener("mouseleave", () => hold("hover", false));
+  root.addEventListener("focusin", () => hold("focus", true));
+  root.addEventListener("focusout", e => { if (!root.contains(e.relatedTarget)) hold("focus", false); });
+  document.addEventListener("visibilitychange", () => hold("tab", document.hidden));
+  if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => hold("offscreen", !e.isIntersecting), { threshold: .25 }).observe(frame);
+  reduce.addEventListener && reduce.addEventListener("change", () => { if (reduce.matches) { stopped = true; label(); schedule(); } });
+
+  // swipe: horizontal only, vertical scrolling stays with the page; a swipe never counts as a tap
+  let sx = null, sy = null, swiped = false;
+  frame.addEventListener("touchstart", e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; swiped = false; }, { passive: true });
+  frame.addEventListener("touchend", e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+    swiped = true;
+    const rtl = document.documentElement.dir === "rtl";
+    manual(); go(at + ((dx < 0) !== rtl ? 1 : -1));
+  });
+  // tap / click: open the current work large in the gallery viewer
+  openBtn.addEventListener("click", () => {
+    if (swiped) { swiped = false; return; }
+    const list = items.filter(Boolean);
+    if (!items[at] || !window.openLightbox) return;
+    hold("viewer", true);
+    window.openLightbox(items[at], list);
+  });
+  window.onLightboxClose = () => hold("viewer", false);
+  window.heroLang = label;
+
+  // preload the next photo once the first one is in, so the first fade is smooth
+  const first = slides[at].querySelector("img");
+  load(at);
+  const warm = () => load((at + 1) % slides.length);
+  first.complete ? warm() : first.addEventListener("load", warm, { once: true });
+  go(at);
 })();
 </script>
 
