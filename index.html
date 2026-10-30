@@ -348,6 +348,15 @@ footer { padding-bottom: 96px; }
 .lb-stage img { display: block; width: 100%; height: auto; max-height: calc(100vh - 170px); max-height: calc(100dvh - 170px); object-fit: contain;
   border-radius: 3px; background: var(--ink); opacity: 0; transition: opacity .35s var(--ease); }
 .lb-stage img.ready { opacity: 1; }
+.lb-stage video { display: block; width: 100%; max-height: calc(100vh - 290px); max-height: calc(100dvh - 290px); background: #000; border-radius: 4px; }
+.lb-panel.has-set .lb-stage img { max-height: calc(100vh - 290px); max-height: calc(100dvh - 290px); }
+.lb-strip { display: flex; gap: 6px; overflow-x: auto; padding: 2px 4px; scrollbar-width: thin; }
+.lb-strip button { flex: 0 0 auto; width: 48px; height: 60px; padding: 0; border: 2px solid transparent; border-radius: 3px; background: #000 center / cover no-repeat; cursor: pointer; opacity: .6; position: relative; color: #fff; font-size: 18px; }
+.lb-strip button[aria-current="true"] { border-color: var(--teal-hi); opacity: 1; }
+.lb-strip button:hover { opacity: 1; }
+.ba-set { right: 10px; }
+html[dir="rtl"] .ba-set { right: auto; left: 10px; }
+.lb-stage [hidden] { display: none !important; }
 .lb-stage figcaption { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding-inline: 4px; color: var(--muted); font-size: 14px; }
 .lb-stage figcaption b { color: var(--bone); font-weight: 500; font-size: 16px; }
 .lb-count { margin-inline-start: auto; font-variant-numeric: tabular-nums; opacity: .75; }
@@ -683,6 +692,8 @@ html[dir="rtl"] .cr-prev svg, html[dir="rtl"] .cr-next svg { transform: scaleX(-
   <div class="lb-panel" id="lb-panel">
     <figure class="lb-stage">
       <img id="lb-img" alt="">
+      <video id="lb-video" controls playsinline muted loop preload="none" hidden></video>
+      <div class="lb-strip" id="lb-strip" hidden></div>
       <figcaption><b id="lb-title"></b><span id="lb-sub"></span><span class="lb-meta" id="lb-meta"></span><span class="lb-count" id="lb-count"></span>
         <a class="btn lb-ask" id="lb-ask" href="https://wa.link/2ov8pp" target="_blank" rel="noopener"></a></figcaption>
     </figure>
@@ -725,7 +736,7 @@ const T = {
     before: "Before", after: "After", fresh: "Fresh", healed: "Healed", lbClose: "Close", wazeGo: "Navigate with Waze", callUs: "Call us", showAll: "Show all works ({n})", lbPrev: "Previous photo", lbNext: "Next photo",
     fAll: "All", fOld: "Traditional", fJap: "Japanese", fCov: "Cover-ups", fHea: "Healed",
     flashTitle: "Flash", flashLead: "Designs drawn by Alexey. Like one? Send its number on WhatsApp and we'll talk it through.",
-    claim: "Ask on WhatsApp", flashMsg: "Hi! I saw flash #{n} on your site and I'd like to ask about it.",
+    claim: "Ask on WhatsApp", nPhotos: "{n} photos", withVideo: "video", flashMsg: "Hi! I saw flash #{n} on your site and I'd like to ask about it.",
     portrait: "Alexey Zamotevsky tattooing at Ink Donkey tattoo studio, Even Yehuda", artistEyebrow: "Tattoo artist", artistName: "Alexey Zamotevsky",
     artistBio: "Alexey Zamotevsky: 25 years of tattooing, drawing and a lot of experience. Traditional is the foundation — precise, confident lines, color that sits well, and a design built from scratch just for you.",
     bookTitle: "How booking works",
@@ -791,7 +802,7 @@ const T = {
     before: "לפני", after: "אחרי", fresh: "טרי", healed: "אחרי החלמה", lbClose: "סגירה", wazeGo: "ניווט עם Waze", callUs: "התקשרו אלינו", showAll: "לכל העבודות ({n})", lbPrev: "התמונה הקודמת", lbNext: "התמונה הבאה",
     fAll: "הכל", fOld: "טרדישנל", fJap: "יפני", fCov: "cover-up", fHea: "החלמה",
     flashTitle: "פלאש", flashLead: "עיצובים שאלכסיי צייר. אהבתם אחד? שלחו לנו את המספר שלו בוואטסאפ ונדבר עליו.",
-    claim: "לשאול בוואטסאפ", flashMsg: "שלום! ראיתי באתר את פלאש מספר {n} ואשמח לשאול עליו.",
+    claim: "לשאול בוואטסאפ", nPhotos: "{n} תמונות", withVideo: "וידאו", flashMsg: "שלום! ראיתי באתר את פלאש מספר {n} ואשמח לשאול עליו.",
     portrait: "אלכסיי זמוטבסקי מקעקע בסטודיו Ink Donkey, אבן יהודה", artistEyebrow: "מקעקע", artistName: "אלכסיי זמוטבסקי",
     artistBio: "אלכסיי זמוטבסקי: 25 שנה של קעקועים, ציור והמון ניסיון. הטרדישנל הוא הבסיס — קווים מדויקים ובטוחים, צבע שיושב טוב ועיצוב שנבנה מאפס במיוחד בשבילכם.",
     bookTitle: "איך מתאמים תור?",
@@ -917,9 +928,9 @@ const WORK = [
     alt: { en: "Black and grey clown tattoo, fresh and after healing", he: "קעקוע ליצן בשחור-אפור, טרי ואחרי החלמה" } },
   { f: "old", img: "img/flower-belly.jpg", body: { en: "belly", he: "בטן" }, en: "Flower", he: "פרח",
     alt: { en: "Black traditional flower tattoo on the belly", he: "קעקוע פרח שחור בסגנון טרדישנל על הבטן" } },
-  { f: "jap", img: "img/samurai-cat.jpg", body: { en: "arm", he: "יד" }, en: "Cat in a samurai helmet", he: "חתול בקסדת סמוראי",
+  { f: "jap", img: "img/samurai-cat.jpg", set: ["img/samurai-cat-2.jpg", "img/samurai-cat-3.jpg", "img/samurai-cat-4.jpg"], body: { en: "arm", he: "יד" }, en: "Cat in a samurai helmet", he: "חתול בקסדת סמוראי",
     alt: { en: "Japanese style color tattoo of a cat in a samurai helmet with waves and cherry blossoms on the arm", he: "קעקוע צבעוני בסגנון יפני של חתול בקסדת סמוראי עם גלים ופריחת דובדבן על היד" } },
-  { f: "jap", img: "img/koi.jpg", en: "Koi", he: "דג קוי",
+  { f: "jap", img: "img/koi.jpg", set: ["img/koi-2.jpg", "img/koi-3.jpg", "img/koi-4.jpg", "img/koi-5.jpg", "img/koi-6.jpg"], en: "Koi", he: "דג קוי",
     alt: { en: "Japanese style color tattoo of a koi fish with waves and cherry blossoms", he: "קעקוע צבעוני בסגנון יפני של דג קוי עם גלים ופריחת דובדבן" } }
 ];
 // flash sheets drawn by Alexey (no prices or availability shown until confirmed)
@@ -954,8 +965,9 @@ function tile(w, i) {
   const t = T[lang];
   const story = w.story ? `<small>${w.story[lang]}</small>` : "";
   const ba = w.pair && w.pair.length ? `<span class="ba ba-before">${t[w.pair[0]]}</span><span class="ba ba-after">${t[w.pair[1]]}</span>` : "";
+  const many = w.set ? `<span class="ba ba-set">${t.nPhotos.replace("{n}", w.set.length + 1)}${w.video ? " · ▶ " + t.withVideo : ""}</span>` : "";
   return w.img
-    ? `<figure class="tile photo${w.pair ? " wide" : ""}" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" srcset="${thumb(w.img)} ${w.pair ? 800 : 480}w, ${w.img} ${w.pair ? 1300 : 720}w" sizes="${w.pair ? "(max-width: 760px) 92vw, 560px" : "(max-width: 760px) 46vw, 270px"}" alt="${w.alt[lang] + SEO[lang]}" loading="lazy" decoding="async" fetchpriority="low">${ba}<figcaption><b>${w[lang]}</b>${story}</figcaption></figure>`
+    ? `<figure class="tile photo${w.pair ? " wide" : ""}" tabindex="0" role="button" data-i="${i}" aria-label="${w[lang]}"><img src="${w.img}" srcset="${thumb(w.img)} ${w.pair ? 800 : 480}w, ${w.img} ${w.pair ? 1300 : 720}w" sizes="${w.pair ? "(max-width: 760px) 92vw, 560px" : "(max-width: 760px) 46vw, 270px"}" alt="${w.alt[lang] + SEO[lang]}" loading="lazy" decoding="async" fetchpriority="low">${ba}${many}<figcaption><b>${w[lang]}</b>${story}</figcaption></figure>`
     : `<div class="tile" data-glyph="${w.g}"><b>${w[lang]}</b>${story}</div>`;
 }
 
@@ -1084,9 +1096,15 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   const photos = () => current;
   let at = 0, lastFocus = null, startX = null;
 
+  const video = document.getElementById("lb-video"), strip = document.getElementById("lb-strip");
   function show(n) {
     const list = photos(); at = (n + list.length) % list.length;
     const w = list[at];
+    video.pause();
+    const isVideo = !!w.clip;
+    video.hidden = !isVideo; img.hidden = isVideo;
+    if (isVideo) { video.poster = w.img; if (video.getAttribute("src") !== w.clip) video.src = w.clip; video.play().catch(() => {}); }
+    strip.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-current", i === at));
     img.classList.remove("ready");
     const big = w.img.replace("img/", "img/large/");
     const pre = new Image();
@@ -1105,7 +1123,14 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   }
   window.openLightbox = (w, list) => open(w, list);
   function open(w, list) {
-    current = list.filter(x => x.img);
+    // a work with several photos (and a video) opens as its own carousel
+    const set = w.set ? [w].concat(w.set.map(src => Object.assign({}, w, { img: src }))).concat(w.video ? [Object.assign({}, w, { img: w.video.poster, clip: w.video.src })] : []) : null;
+    current = set || list.filter(x => x.img);
+    if (set) w = set[0];
+    document.getElementById("lb-panel").classList.toggle("has-set", !!set);
+    strip.hidden = !set;
+    strip.innerHTML = set ? set.map((x, i) => `<button type="button" aria-label="${i + 1} / ${set.length}" style="background-image:url('${thumb(x.img)}')">${x.clip ? "▶" : ""}</button>`).join("") : "";
+    strip.querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => show(i)));
     lastFocus = document.activeElement;
     lb.hidden = false; document.body.classList.add("lb-locked");
     show(photos().indexOf(w));
@@ -1114,7 +1139,8 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   }
   function close() {
     lb.classList.remove("open"); document.body.classList.remove("lb-locked");
-    setTimeout(() => { lb.hidden = true; img.removeAttribute("src"); }, reduceMotion ? 0 : 350);
+    video.pause();
+    setTimeout(() => { lb.hidden = true; img.removeAttribute("src"); video.removeAttribute("src"); video.load(); }, reduceMotion ? 0 : 350);
     lastFocus && lastFocus.focus();
     window.onLightboxClose && window.onLightboxClose();
   }
