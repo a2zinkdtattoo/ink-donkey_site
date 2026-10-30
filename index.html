@@ -161,7 +161,10 @@ section { padding-block: 72px; border-top: 1px solid var(--line); }
 .flash .sec-head p { color: #46524f; }
 .sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 .card { background: #fff; border: 2px solid var(--paper-ink); padding: 16px; display: grid; gap: 10px; }
-.card .art { aspect-ratio: 1; display: grid; place-items: center; font-family: var(--display); font-size: 64px; color: var(--teal); background: repeating-linear-gradient(45deg, #f3f6f5 0 8px, #fff 8px 16px); border: 1px solid #c9d3d0; }
+.card { cursor: pointer; margin: 0; align-content: start; }
+.card img { width: 100%; height: auto; display: block; border: 1px solid #c9d3d0; background: #f3f6f5; }
+.card figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 560px) { .sheet { grid-template-columns: 1fr 1fr; gap: 10px; } .card { padding: 8px; gap: 8px; } .card figcaption { font-size: 13px; gap: 4px; } .card a { font-size: 13px; } }
 .card h3 { font-size: 22px; }
 .card .meta { display: flex; justify-content: space-between; font-size: 13px; color: #46524f; font-variant-numeric: tabular-nums; }
 .card a { justify-self: start; font-weight: 700; font-size: 14px; color: var(--teal); text-decoration: none; border-bottom: 2px solid currentColor; }
@@ -483,6 +486,7 @@ html[dir="rtl"] .cr-prev svg, html[dir="rtl"] .cr-next svg { transform: scaleX(-
     </a>
     <nav>
       <a href="#work" data-i18n="navWork">Work</a>
+      <a href="#flash" data-i18n="navFlash">Flash</a>
       <a href="#artist" data-i18n="navArtist">Artist</a>
       <a href="#shop" data-i18n="navShop">Shop</a>
       <a href="#book" data-i18n="navBook">Booking</a>
@@ -574,11 +578,11 @@ html[dir="rtl"] .cr-prev svg, html[dir="rtl"] .cr-next svg { transform: scaleX(-
     </div>
   </section>
 
-  <section id="flash" class="flash" hidden>
+  <section id="flash" class="flash">
     <div class="wrap">
       <div class="sec-head">
-        <h2 class="sign" data-i18n="flashTitle">Up for grabs</h2>
-        <p data-i18n="flashLead">Ready designs drawn by Alexey. Each one is tattooed once. Pick one, send the name on WhatsApp, and we'll find a date.</p>
+        <h2 class="sign" data-i18n="flashTitle">Flash</h2>
+        <p data-i18n="flashLead">Designs drawn by Alexey. Like one? Send its number on WhatsApp and we'll talk it through.</p>
       </div>
       <div class="sheet" id="sheet"></div>
     </div>
@@ -720,8 +724,8 @@ const T = {
     workTitle: "Work", workLead: "New work from the studio, some fresh and some already healed. It's after healing that you see the real result — how the tattoo sits in the skin and holds up over time.",
     before: "Before", after: "After", fresh: "Fresh", healed: "Healed", lbClose: "Close", wazeGo: "Navigate with Waze", callUs: "Call us", showAll: "Show all works ({n})", lbPrev: "Previous photo", lbNext: "Next photo",
     fAll: "All", fOld: "Traditional", fJap: "Japanese", fCov: "Cover-ups", fHea: "Healed",
-    flashTitle: "Up for grabs", flashLead: "Ready designs drawn by Alexey. Each one is tattooed once. Pick one, send the name on WhatsApp, and we'll find a date.",
-    available: "Available", taken: "Taken", claim: "Claim on WhatsApp", size: "Size",
+    flashTitle: "Flash", flashLead: "Designs drawn by Alexey. Like one? Send its number on WhatsApp and we'll talk it through.",
+    claim: "Ask on WhatsApp", flashMsg: "Hi! I saw flash #{n} on your site and I'd like to ask about it.",
     portrait: "Alexey Zamotevsky tattooing at Ink Donkey tattoo studio, Even Yehuda", artistEyebrow: "Tattoo artist", artistName: "Alexey Zamotevsky",
     artistBio: "Alexey Zamotevsky: 25 years of tattooing, drawing and a lot of experience. Traditional is the foundation — precise, confident lines, color that sits well, and a design built from scratch just for you.",
     bookTitle: "How booking works",
@@ -786,8 +790,8 @@ const T = {
     workTitle: "עבודות", workLead: "עבודות חדשות מהסטודיו, חלקן טריות וחלקן כבר החלימו. דווקא אחרי ההחלמה אפשר לראות את התוצאה האמיתית — איך הקעקוע יושב על העור ונראה לאורך זמן.",
     before: "לפני", after: "אחרי", fresh: "טרי", healed: "אחרי החלמה", lbClose: "סגירה", wazeGo: "ניווט עם Waze", callUs: "התקשרו אלינו", showAll: "לכל העבודות ({n})", lbPrev: "התמונה הקודמת", lbNext: "התמונה הבאה",
     fAll: "הכל", fOld: "טרדישנל", fJap: "יפני", fCov: "cover-up", fHea: "החלמה",
-    flashTitle: "עיצובים פנויים", flashLead: "עיצובים מוכנים שאלכסיי צייר. כל אחד מקועקע פעם אחת בלבד. בחרו, שלחו את השם בוואטסאפ ונקבע תאריך.",
-    available: "פנוי", taken: "נלקח", claim: "לשריון בוואטסאפ", size: "גודל",
+    flashTitle: "פלאש", flashLead: "עיצובים שאלכסיי צייר. אהבתם אחד? שלחו לנו את המספר שלו בוואטסאפ ונדבר עליו.",
+    claim: "לשאול בוואטסאפ", flashMsg: "שלום! ראיתי באתר את פלאש מספר {n} ואשמח לשאול עליו.",
     portrait: "אלכסיי זמוטבסקי מקעקע בסטודיו Ink Donkey, אבן יהודה", artistEyebrow: "מקעקע", artistName: "אלכסיי זמוטבסקי",
     artistBio: "אלכסיי זמוטבסקי: 25 שנה של קעקועים, ציור והמון ניסיון. הטרדישנל הוא הבסיס — קווים מדויקים ובטוחים, צבע שיושב טוב ועיצוב שנבנה מאפס במיוחד בשבילכם.",
     bookTitle: "איך מתאמים תור?",
@@ -902,14 +906,26 @@ const WORK = [
   { f: "hea", img: "img/toad-healed.jpg", en: "Toad on coins, healed", he: "קרפדה על מטבעות, אחרי החלמה",
     alt: { en: "Healed black and grey tattoo of a toad sitting on coins", he: "קעקוע קרפדה על מטבעות בשחור-אפור אחרי החלמה" } },
   { f: "hea", img: "img/skull-cacti-healed.jpg", en: "Skull and cacti, healed", he: "גולגולת וקקטוסים, אחרי החלמה",
-    alt: { en: "Healed black and grey traditional tattoo of a skull with cacti", he: "קעקוע גולגולת עם קקטוסים בשחור-אפור אחרי החלמה" } }
+    alt: { en: "Healed black and grey traditional tattoo of a skull with cacti", he: "קעקוע גולגולת עם קקטוסים בשחור-אפור אחרי החלמה" } },
+  { f: "hea", img: "img/eye-wings.jpg", body: { en: "arm", he: "יד" }, en: "Eye with wings, healed", he: "עין עם כנפיים, אחרי החלמה",
+    alt: { en: "Healed black and grey tattoo of an eye wrapped in wings on the arm", he: "קעקוע עין עטופה בכנפיים בשחור-אפור על היד, אחרי החלמה" } },
+  { f: "old", img: "img/star-hand.jpg", body: { en: "back of the leg", he: "גב הרגל" }, en: "Star and hand", he: "כוכב ויד",
+    alt: { en: "Fresh black tattoo of a star above a hand on the back of the leg", he: "קעקוע שחור טרי של כוכב מעל יד בגב הרגל" } },
+  { f: "old", img: "img/globe-flowers.jpg", body: { en: "inner arm", he: "הצד הפנימי של היד" }, en: "Globe and flowers", he: "גלובוס ופרחים",
+    alt: { en: "Traditional color tattoo of a globe with flowers on the inner arm", he: "קעקוע צבעוני בסגנון טרדישנל של גלובוס עם פרחים בצד הפנימי של היד" } },
+  { f: "hea", pair: ["fresh", "healed"], img: "img/clown-healed-pair.jpg", en: "Clown, healed", he: "ליצן, אחרי החלמה",
+    alt: { en: "Black and grey clown tattoo, fresh and after healing", he: "קעקוע ליצן בשחור-אפור, טרי ואחרי החלמה" } },
+  { f: "old", img: "img/flower-belly.jpg", body: { en: "belly", he: "בטן" }, en: "Flower", he: "פרח",
+    alt: { en: "Black traditional flower tattoo on the belly", he: "קעקוע פרח שחור בסגנון טרדישנל על הבטן" } },
+  { f: "jap", img: "img/samurai-cat.jpg", body: { en: "arm", he: "יד" }, en: "Cat in a samurai helmet", he: "חתול בקסדת סמוראי",
+    alt: { en: "Japanese style color tattoo of a cat in a samurai helmet with waves and cherry blossoms on the arm", he: "קעקוע צבעוני בסגנון יפני של חתול בקסדת סמוראי עם גלים ופריחת דובדבן על היד" } },
+  { f: "jap", img: "img/koi.jpg", en: "Koi", he: "דג קוי",
+    alt: { en: "Japanese style color tattoo of a koi fish with waves and cherry blossoms", he: "קעקוע צבעוני בסגנון יפני של דג קוי עם גלים ופריחת דובדבן" } }
 ];
-const FLASH = [
-  { g: "🐴", en: "Donkey with roses", he: "חמור עם ורדים", cm: 12, taken: false },
-  { g: "⚡", en: "Lightning heart", he: "לב ברק", cm: 7, taken: false },
-  { g: "🦅", en: "Eagle", he: "נשר", cm: 15, taken: true },
-  { g: "🐍", en: "Snake & dagger", he: "נחש ופגיון", cm: 14, taken: false }
-];
+// flash sheets drawn by Alexey (no prices or availability shown until confirmed)
+const FLASH = Array.from({ length: 16 }, (_, i) => ({ img: `img/flash/f${i + 1}.jpg`, n: i + 1,
+  en: `Flash #${i + 1}`, he: `פלאש מס׳ ${i + 1}`,
+  alt: { en: "Traditional tattoo flash drawn by Alexey", he: "פלאש טרדישנל שאלכסיי צייר" } }));
 
 // WhatsApp: set to the confirmed number (e.g. "9725XXXXXXXX") to prefill the message; until then the wa.link short link is used
 const WA_NUMBER = "972506865954";
@@ -992,14 +1008,11 @@ function render() {
   const more = document.getElementById("more");
   more.hidden = expanded || shown.length <= LIMIT;
   more.textContent = t.showAll.replace("{n}", shown.length);
-  document.getElementById("sheet").innerHTML = FLASH.map(f => `
-    <div class="card${f.taken ? " is-taken" : ""}">
-      <div class="art" aria-hidden="true">${f.g}</div>
-      <span class="tag${f.taken ? " taken" : ""}">${f.taken ? t.taken : t.available}</span>
-      <h3>${f[lang]}</h3>
-      <div class="meta"><span>${t.size}</span><span>~${f.cm} cm</span></div>
-      ${f.taken ? "" : `<a href="https://wa.link/2ov8pp" target="_blank" rel="noopener">${t.claim}</a>`}
-    </div>`).join("");
+  document.getElementById("sheet").innerHTML = FLASH.map((f, i) => `
+    <figure class="card" tabindex="0" role="button" data-i="${i}" aria-label="${f[lang]}">
+      <img src="${f.img}" srcset="${f.img.replace("img/", "img/thumb/").replace(/\.jpg$/, ".webp")} 560w, ${f.img} 900w" sizes="(max-width: 760px) 92vw, 300px" alt="${f.alt[lang]}" loading="lazy" decoding="async">
+      <figcaption><b>${f[lang]}</b><a href="${waHref(t.flashMsg.replace("{n}", f.n))}" target="_blank" rel="noopener">${t.claim}</a></figcaption>
+    </figure>`).join("");
 }
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const grid = document.getElementById("grid"), main = document.querySelector("main");
@@ -1109,6 +1122,12 @@ addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8
   grid.addEventListener("keydown", e => {
     const t = e.target.closest(".tile.photo");
     if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); open(shown[+t.dataset.i], shown); }
+  });
+  const sheet = document.getElementById("sheet");
+  sheet.addEventListener("click", e => { if (e.target.closest("a")) return; const t = e.target.closest(".card"); if (t) open(FLASH[+t.dataset.i], FLASH); });
+  sheet.addEventListener("keydown", e => {
+    const t = e.target.closest(".card");
+    if (t && e.target === t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); open(FLASH[+t.dataset.i], FLASH); }
   });
   const shopGrid = document.getElementById("shop-grid");
   shopGrid.addEventListener("click", e => { const t = e.target.closest(".tile.photo"); if (t) open(SHOP[+t.dataset.i], SHOP); });
